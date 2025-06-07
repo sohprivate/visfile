@@ -12,5 +12,8 @@ classifiers = [
 ]
 dynamic = ["version"]
 
+[project.scripts]
+visfile = "visfile_cli:main"
+
 [tool.maturin]
 features = ["pyo3/extension-module"]

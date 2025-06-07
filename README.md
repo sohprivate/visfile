@@ -62,7 +62,23 @@ visfile.treemap(".", "my_directory.png")
 visfile.treemap("/path/to/project", "project_visualization.png")
 ```
 
-#### コマンドラインから実行
+#### 🖥️ CLIコマンドで実行
+
+```bash
+# 現在のディレクトリを可視化
+visfile .
+
+# 指定したディレクトリを可視化
+visfile /path/to/project
+
+# 出力ファイル名を指定
+visfile src/ source_map.png
+
+# ヘルプを表示
+visfile --help
+```
+
+#### 🐍 Pythonから実行
 
 ```bash
 # 1行で実行
@@ -115,6 +131,7 @@ visfile/
 │   └── lib.rs          # メインRustライブラリ
 ├── Cargo.toml          # Rust依存関係設定
 ├── pyproject.toml      # Python/maturinビルド設定
+├── visfile_cli.py      # CLIインターフェース
 ├── test_visfile.py     # テストスクリプト
 └── README.md           # このファイル
 ```
@@ -172,6 +189,9 @@ A: 現在は1200x800ピクセル固定ですが、今後のバージョンで設
 
 ### Q: エラーが発生したらどうすれば？
 A: まず`python test_visfile.py`を実行してテストが通るかご確認ください。
+
+### Q: どこからでもCLIコマンドを使えますか？
+A: はい。`maturin develop`でインストール後、任意のディレクトリから`visfile`コマンドが使用可能です。
 
 ---
 
