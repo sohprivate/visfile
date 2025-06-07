@@ -81,22 +81,26 @@ visfile.treemap(".", "my_directory.png")
 visfile.treemap("/path/to/project", "project_visualization.png")
 ```
 
-#### 🖥️ CLIコマンドで実行（推奨）
+#### 🖥️ CLIスクリプトで実行（推奨）
 
 ```bash
 # 基本的な使い方
-visfile .                           # 現在のディレクトリ -> treemap.png
-visfile /path/to/project            # 指定ディレクトリ -> treemap.png
-visfile src/ source_map.png         # カスタム出力ファイル名
+python visfile_cli.py .                           # 現在のディレクトリ -> treemap.png
+python visfile_cli.py /path/to/project            # 指定ディレクトリ -> treemap.png
+python visfile_cli.py src/ source_map.png         # カスタム出力ファイル名
 
 # 実用例
-visfile ~/Documents documents.png   # Documentsフォルダを可視化
-visfile ~/Desktop/project           # デスクトップのプロジェクト
-visfile . my_workspace.png          # 現在地をカスタム名で保存
+python visfile_cli.py ~/Documents documents.png   # Documentsフォルダを可視化
+python visfile_cli.py ~/Desktop/project           # デスクトップのプロジェクト
+python visfile_cli.py . my_workspace.png          # 現在地をカスタム名で保存
 
 # ヘルプとバージョン
-visfile --help                      # 使用方法を表示
-visfile --version                   # バージョン情報
+python visfile_cli.py --help                      # 使用方法を表示
+python visfile_cli.py --version                   # バージョン情報
+
+# エイリアス設定で簡単に（任意）
+alias visfile="python /path/to/visfile/visfile_cli.py"
+# その後は: visfile . で使用可能
 ```
 
 #### 🐍 Pythonから実行
