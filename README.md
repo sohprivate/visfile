@@ -34,7 +34,7 @@ visfile.treemap("my_project/", "project_map.png")
 - Python 3.8+
 - maturin
 
-### インストール
+### 📦 インストール（初回のみ）
 
 ```bash
 # 1. リポジトリをクローン
@@ -47,6 +47,25 @@ pip install maturin
 # 3. ライブラリをビルド＆インストール
 maturin develop
 ```
+
+### 🌍 どこからでも使用可能
+
+インストール後は、**任意のディレクトリ**から`visfile`コマンドが使用できます：
+
+```bash
+# 例: Documentsフォルダを可視化
+cd ~/Documents
+visfile .
+
+# 例: デスクトップから他のフォルダを指定
+cd ~/Desktop  
+visfile ~/projects/my_app app_structure.png
+
+# 例: 現在地から相対パスで指定
+visfile ../parent_folder parent.png
+```
+
+**✅ git cloneしたフォルダの中にいる必要はありません！**
 
 ### 使用方法
 
@@ -62,20 +81,22 @@ visfile.treemap(".", "my_directory.png")
 visfile.treemap("/path/to/project", "project_visualization.png")
 ```
 
-#### 🖥️ CLIコマンドで実行
+#### 🖥️ CLIコマンドで実行（推奨）
 
 ```bash
-# 現在のディレクトリを可視化
-visfile .
+# 基本的な使い方
+visfile .                           # 現在のディレクトリ -> treemap.png
+visfile /path/to/project            # 指定ディレクトリ -> treemap.png
+visfile src/ source_map.png         # カスタム出力ファイル名
 
-# 指定したディレクトリを可視化
-visfile /path/to/project
+# 実用例
+visfile ~/Documents documents.png   # Documentsフォルダを可視化
+visfile ~/Desktop/project           # デスクトップのプロジェクト
+visfile . my_workspace.png          # 現在地をカスタム名で保存
 
-# 出力ファイル名を指定
-visfile src/ source_map.png
-
-# ヘルプを表示
-visfile --help
+# ヘルプとバージョン
+visfile --help                      # 使用方法を表示
+visfile --version                   # バージョン情報
 ```
 
 #### 🐍 Pythonから実行
@@ -191,7 +212,13 @@ A: 現在は1200x800ピクセル固定ですが、今後のバージョンで設
 A: まず`python test_visfile.py`を実行してテストが通るかご確認ください。
 
 ### Q: どこからでもCLIコマンドを使えますか？
-A: はい。`maturin develop`でインストール後、任意のディレクトリから`visfile`コマンドが使用可能です。
+A: **はい！** `maturin develop`でインストール後、システム全体で`visfile`コマンドが使用可能です。git cloneしたフォルダにいる必要はありません。
+
+### Q: インストール後の使い方は？
+A: 3ステップで完了：
+1. `git clone` & `maturin develop`（初回のみ）
+2. 任意の場所に`cd`で移動
+3. `visfile .`でそのフォルダを可視化
 
 ---
 
