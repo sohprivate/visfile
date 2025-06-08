@@ -46,23 +46,23 @@ pip install maturin
 
 # 3. ライブラリをビルド＆インストール
 maturin develop
+
+# 4. CLIコマンドをインストール（推奨）
+./install.sh
 ```
 
 ### 🌍 どこからでも使用可能
 
-インストール後は、**任意のディレクトリ**から`visfile`コマンドが使用できます：
+インストール後は、**任意のディレクトリ**から`visfile`コマンドが使用できます！
 
 ```bash
-# 例: Documentsフォルダを可視化
-cd ~/Documents
-visfile .
+# CLIコマンドで実行（install.sh実行後）
+visfile .                           # 現在のディレクトリを可視化
+visfile ~/Documents docs.png        # Documentsフォルダを指定ファイル名で
+visfile /path/to/project            # 任意のプロジェクトを可視化
 
-# 例: デスクトップから他のフォルダを指定
-cd ~/Desktop  
-visfile ~/projects/my_app app_structure.png
-
-# 例: 現在地から相対パスで指定
-visfile ../parent_folder parent.png
+# ヘルプを表示
+visfile --help
 ```
 
 **✅ git cloneしたフォルダの中にいる必要はありません！**
@@ -81,26 +81,30 @@ visfile.treemap(".", "my_directory.png")
 visfile.treemap("/path/to/project", "project_visualization.png")
 ```
 
-#### 🖥️ CLIスクリプトで実行（推奨）
+#### 🖥️ CLIコマンドで実行（推奨）
 
 ```bash
-# 基本的な使い方
-python visfile_cli.py .                           # 現在のディレクトリ -> treemap.png
-python visfile_cli.py /path/to/project            # 指定ディレクトリ -> treemap.png
-python visfile_cli.py src/ source_map.png         # カスタム出力ファイル名
+# install.sh実行後、グローバルコマンドとして使用可能
+visfile .                           # 現在のディレクトリ -> treemap.png
+visfile /path/to/project            # 指定ディレクトリ -> treemap.png
+visfile src/ source_map.png         # カスタム出力ファイル名
 
 # 実用例
-python visfile_cli.py ~/Documents documents.png   # Documentsフォルダを可視化
-python visfile_cli.py ~/Desktop/project           # デスクトップのプロジェクト
-python visfile_cli.py . my_workspace.png          # 現在地をカスタム名で保存
+visfile ~/Documents documents.png   # Documentsフォルダを可視化
+visfile ~/Desktop/project           # デスクトップのプロジェクト
+visfile . my_workspace.png          # 現在地をカスタム名で保存
 
 # ヘルプとバージョン
-python visfile_cli.py --help                      # 使用方法を表示
-python visfile_cli.py --version                   # バージョン情報
+visfile --help                      # 使用方法を表示
+visfile --version                   # バージョン情報
+```
 
-# エイリアス設定で簡単に（任意）
-alias visfile="python /path/to/visfile/visfile_cli.py"
-# その後は: visfile . で使用可能
+#### 📝 スクリプトで直接実行（代替方法）
+
+```bash
+# install.shを使わない場合
+python visfile_cli.py .
+python visfile_cli.py ~/Documents documents.png
 ```
 
 #### 🐍 Pythonから実行
@@ -157,6 +161,7 @@ visfile/
 ├── Cargo.toml          # Rust依存関係設定
 ├── pyproject.toml      # Python/maturinビルド設定
 ├── visfile_cli.py      # CLIインターフェース
+├── install.sh          # CLIインストールスクリプト
 ├── test_visfile.py     # テストスクリプト
 └── README.md           # このファイル
 ```
