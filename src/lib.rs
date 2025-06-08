@@ -322,13 +322,15 @@ fn generate_piechart_image(root: &DirNode, output_path: &str) -> Result<()> {
             (chart_x + bar_width, y + bar_height)
         ], color.filled()))?;
         
-        // Draw percentage label
+        // Draw percentage label (Unicode-safe)
+        let name = if node.name.chars().count() > 20 {
+            format!("{}...", node.name.chars().take(17).collect::<String>())
+        } else {
+            node.name.clone()
+        };
+        
         let label = format!("{}: {:.1}% ({})", 
-            if node.name.len() > 20 { 
-                format!("{}...", &node.name[..17])
-            } else { 
-                node.name.clone() 
-            },
+            name,
             percentage,
             format_size(node.size)
         );
