@@ -12,19 +12,27 @@ VisFileは、ディレクトリ内のファイルサイズを可視化するRust
 ### ✨ 特徴
 
 - 🚀 **高速**: Rustによる並列処理でディレクトリスキャン
-- 📊 **直感的**: ファイルサイズに比例したツリーマップ表示
+- 📊 **2つの可視化方式**: ツリーマップ（階層表示）とバーチャート（使用率表示）
+- 🎯 **直感的**: パーセンテージとファイルサイズを併記
 - 🐍 **使いやすい**: Pythonから1行で呼び出し可能
-- 🎨 **美しい**: 階層ごとに色分けされた見やすい画像出力
+- 🎨 **美しい**: カラフルで見やすい画像出力
 - 📦 **軽量**: 最小限の依存関係
 
 ### 🖼️ サンプル出力
 
+#### ツリーマップ（階層表示）
 ```python
 import visfile
 visfile.treemap("my_project/", "project_map.png")
 ```
 
-![例: ディレクトリ構造のツリーマップ](test_treemap.png)
+#### バーチャート（使用率表示）
+```python
+import visfile
+visfile.piechart("my_project/", "usage_chart.png")
+```
+
+![例: ディレクトリ構造の可視化](test_treemap.png)
 
 ## 🚀 クイックスタート
 
@@ -57,9 +65,10 @@ maturin develop
 
 ```bash
 # CLIコマンドで実行（install.sh実行後）
-visfile .                           # 現在のディレクトリを可視化
+visfile .                           # ツリーマップ（デフォルト）
+visfile . --type pie                # バーチャート（使用率表示）
 visfile ~/Documents docs.png        # Documentsフォルダを指定ファイル名で
-visfile /path/to/project            # 任意のプロジェクトを可視化
+visfile /path/to/project chart.png -t pie  # バーチャート形式で出力
 
 # ヘルプを表示
 visfile --help
@@ -85,14 +94,21 @@ visfile.treemap("/path/to/project", "project_visualization.png")
 
 ```bash
 # install.sh実行後、グローバルコマンドとして使用可能
+
+# ツリーマップ（階層表示）
 visfile .                           # 現在のディレクトリ -> treemap.png
 visfile /path/to/project            # 指定ディレクトリ -> treemap.png
 visfile src/ source_map.png         # カスタム出力ファイル名
 
+# バーチャート（使用率表示）
+visfile . --type pie                # 現在のディレクトリ -> バーチャート
+visfile ~/Documents docs_chart.png -t pie  # 使用率チャート
+visfile src/ usage.png --type pie   # ソースコードの使用率
+
 # 実用例
-visfile ~/Documents documents.png   # Documentsフォルダを可視化
-visfile ~/Desktop/project           # デスクトップのプロジェクト
-visfile . my_workspace.png          # 現在地をカスタム名で保存
+visfile ~/Documents                 # ツリーマップでDocuments可視化
+visfile ~/Documents --type pie      # バーチャートでDocuments使用率表示
+visfile ~/Desktop/project chart.png -t pie  # プロジェクト使用率
 
 # ヘルプとバージョン
 visfile --help                      # 使用方法を表示
@@ -103,8 +119,9 @@ visfile --version                   # バージョン情報
 
 ```bash
 # install.shを使わない場合
-python visfile_cli.py .
-python visfile_cli.py ~/Documents documents.png
+python visfile_cli.py .                    # ツリーマップ
+python visfile_cli.py . --type pie         # バーチャート
+python visfile_cli.py ~/Documents docs.png -t pie  # 使用率チャート
 ```
 
 #### 🐍 Pythonから実行
@@ -123,7 +140,15 @@ python test_visfile.py
 
 #### `visfile.treemap(path, output)`
 
-ディレクトリ構造をツリーマップ画像として可視化します。
+ディレクトリ構造をツリーマップ画像として可視化します（階層表示）。
+
+**パラメータ:**
+- `path` (str): 分析するディレクトリのパス  
+- `output` (str): 出力PNG画像のファイルパス
+
+#### `visfile.piechart(path, output)`
+
+ディレクトリ使用率をバーチャート画像として可視化します（パーセンテージ表示）。
 
 **パラメータ:**
 - `path` (str): 分析するディレクトリのパス
@@ -134,10 +159,15 @@ python test_visfile.py
 ```python
 import visfile
 
-# 様々な使用例
+# ツリーマップ（階層表示）
 visfile.treemap("~/Documents", "documents_map.png")
 visfile.treemap("/usr/local", "system_map.png")
 visfile.treemap("src/", "source_code_map.png")
+
+# バーチャート（使用率表示）
+visfile.piechart("~/Documents", "documents_usage.png")
+visfile.piechart("/usr/local", "system_usage.png")
+visfile.piechart("src/", "source_usage.png")
 
 # エラーハンドリング
 try:
@@ -148,9 +178,16 @@ except Exception as e:
 
 ### 🎨 出力画像の見方
 
-- **四角の大きさ** = ファイル/ディレクトリのサイズ
+#### ツリーマップ
+- **四角の大きさ** = ファイル/ディレクトリのサイズに比例
 - **色の違い** = ディレクトリの階層の深さ
 - **ラベル** = ファイル名とフォーマットされたサイズ表示
+
+#### バーチャート
+- **バーの長さ** = ディレクトリの使用率（パーセンテージ）
+- **色分け** = 各ディレクトリを識別しやすく
+- **ラベル** = ディレクトリ名、パーセンテージ、実際のファイルサイズ
+- **表示** = 上位8項目を使用率順に表示
 
 ### 🏗️ プロジェクト構造
 
@@ -214,6 +251,16 @@ python test_visfile.py
 ### Q: 大きなディレクトリでも動作しますか？
 A: はい。Rustの並列処理により、大容量ディレクトリも高速に処理できます。
 
+### Q: 2つの可視化方式の違いは？
+A: **ツリーマップ**は階層構造を重視し、**バーチャート**は使用率を重視します。
+- ツリーマップ: 入れ子構造でファイル配置を表現
+- バーチャート: パーセンテージで使用率を直感的に表示
+
+### Q: どちらの方式を使うべき？
+A: 目的によって使い分けてください：
+- **ディレクトリ構造を把握したい** → ツリーマップ
+- **容量を多く使っているフォルダを特定したい** → バーチャート
+
 ### Q: 出力画像のサイズは変更できますか？
 A: 現在は1200x800ピクセル固定ですが、今後のバージョンで設定可能にする予定です。
 
@@ -224,10 +271,10 @@ A: まず`python test_visfile.py`を実行してテストが通るかご確認�
 A: **はい！** `maturin develop`でインストール後、システム全体で`visfile`コマンドが使用可能です。git cloneしたフォルダにいる必要はありません。
 
 ### Q: インストール後の使い方は？
-A: 3ステップで完了：
-1. `git clone` & `maturin develop`（初回のみ）
+A: 4ステップで完了：
+1. `git clone` & `maturin develop` & `./install.sh`（初回のみ）
 2. 任意の場所に`cd`で移動
-3. `visfile .`でそのフォルダを可視化
+3. `visfile .`（ツリーマップ）または `visfile . --type pie`（バーチャート）
 
 ---
 

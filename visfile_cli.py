@@ -18,9 +18,10 @@ Examples:
   visfile .                          # Current directory -> treemap.png
   visfile /path/to/project           # Project -> treemap.png
   visfile ~/Documents docs.png       # Documents -> docs.png
-  visfile src/ source_map.png        # Source folder -> source_map.png
+  visfile . --type pie               # Pie chart visualization
+  visfile src/ chart.png -t pie      # Source folder pie chart
 
-🚀 Fast directory scanning with Rust + Beautiful treemap visualization
+🚀 Fast directory scanning with Rust + Beautiful visualizations
         """
     )
     
@@ -34,6 +35,13 @@ Examples:
         nargs='?',
         default='treemap.png',
         help='Output PNG file path (default: treemap.png)'
+    )
+    
+    parser.add_argument(
+        '--type', '-t',
+        choices=['treemap', 'pie'],
+        default='treemap',
+        help='Visualization type: treemap (hierarchical) or pie (percentage)'
     )
     
     parser.add_argument(
@@ -77,22 +85,30 @@ Examples:
         print("  4. maturin develop", file=sys.stderr)
         sys.exit(1)
 
-    # Generate treemap
+    # Generate visualization
     try:
         print(f"🔍 Scanning directory: {input_path}")
-        visfile.treemap(str(input_path), str(output_path))
+        
+        if args.type == 'pie':
+            print("📊 Generating pie chart...")
+            visfile.piechart(str(input_path), str(output_path))
+            viz_type = "pie chart"
+        else:
+            print("🗂️ Generating treemap...")
+            visfile.treemap(str(input_path), str(output_path))
+            viz_type = "treemap"
         
         # Check if file was created and get size
         if output_path.exists():
             file_size = output_path.stat().st_size
             size_str = format_file_size(file_size)
-            print(f"✅ Treemap generated: {output_path} ({size_str})")
+            print(f"✅ {viz_type.title()} generated: {output_path} ({size_str})")
         else:
             print("❌ Error: Output file was not created", file=sys.stderr)
             sys.exit(1)
             
     except Exception as e:
-        print(f"❌ Error generating treemap: {e}", file=sys.stderr)
+        print(f"❌ Error generating {args.type}: {e}", file=sys.stderr)
         sys.exit(1)
 
 def format_file_size(size_bytes):

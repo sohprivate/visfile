@@ -5,6 +5,7 @@ use pyo3::exceptions::PyValueError;
 use walkdir::WalkDir;
 use rayon::prelude::*;
 use plotters::prelude::*;
+use plotters::coord::Shift;
 use anyhow::{Result, anyhow};
 
 #[derive(Debug, Clone)]
@@ -264,6 +265,101 @@ fn format_size(size: u64) -> String {
     }
 }
 
+fn generate_piechart_image(root: &DirNode, output_path: &str) -> Result<()> {
+    let width = 1200u32;
+    let height = 800u32;
+    
+    let root_backend = BitMapBackend::new(output_path, (width, height));
+    let drawing_area = root_backend.into_drawing_area();
+    drawing_area.fill(&WHITE)?;
+
+    // Calculate total size and collect direct children
+    let total_size = root.size as f64;
+    let mut children: Vec<(&DirNode, f64)> = root.children.iter()
+        .filter(|child| child.size > 0)
+        .map(|child| (child, child.size as f64 / total_size * 100.0))
+        .collect();
+    
+    if children.is_empty() {
+        return Err(anyhow!("No files found in directory"));
+    }
+    
+    // Sort by size (descending)
+    children.sort_by(|a, b| b.1.partial_cmp(&a.1).unwrap());
+
+    // Limit to top 8 items for better visibility
+    let top_items: Vec<_> = children.into_iter().take(8).collect();
+
+    // Add title
+    let title = format!("📊 Directory Usage: {}", root.name);
+    drawing_area.draw(&Text::new(
+        title,
+        (width as i32 / 2 - 150, 30),
+        ("Arial", 24).into_font().color(&BLACK)
+    ))?;
+
+    // Draw simple bar chart instead of pie chart for better compatibility
+    let chart_x = 50;
+    let chart_y = 100;
+    let chart_width = 700;
+    let chart_height = 500;
+    let bar_height = chart_height / top_items.len() as i32 - 10;
+
+    let colors = [
+        &RED, &BLUE, &GREEN, &MAGENTA, &CYAN, 
+        &RGBColor(255, 165, 0), &RGBColor(128, 0, 128),
+        &RGBColor(255, 192, 203),
+    ];
+
+    for (i, (node, percentage)) in top_items.iter().enumerate() {
+        let y = chart_y + (i as i32) * (bar_height + 10);
+        let bar_width = (chart_width as f64 * percentage / 100.0) as i32;
+        let color = colors[i % colors.len()];
+        
+        // Draw bar
+        drawing_area.draw(&Rectangle::new([
+            (chart_x, y),
+            (chart_x + bar_width, y + bar_height)
+        ], color.filled()))?;
+        
+        // Draw percentage label
+        let label = format!("{}: {:.1}% ({})", 
+            if node.name.len() > 20 { 
+                format!("{}...", &node.name[..17])
+            } else { 
+                node.name.clone() 
+            },
+            percentage,
+            format_size(node.size)
+        );
+        
+        drawing_area.draw(&Text::new(
+            label,
+            (chart_x + bar_width + 10, y + bar_height / 2),
+            ("Arial", 14).into_font().color(&BLACK)
+        ))?;
+        
+        // Draw percentage inside bar if wide enough
+        if bar_width > 50 {
+            drawing_area.draw(&Text::new(
+                format!("{:.1}%", percentage),
+                (chart_x + 5, y + bar_height / 2),
+                ("Arial", 12).into_font().color(&WHITE)
+            ))?;
+        }
+    }
+
+    // Draw total size info
+    drawing_area.draw(&Text::new(
+        format!("Total Size: {}", format_size(root.size)),
+        (chart_x, chart_y + chart_height + 50),
+        ("Arial", 16).into_font().color(&BLACK)
+    ))?;
+
+    drawing_area.present()?;
+    Ok(())
+}
+
 #[pyfunction]
 fn treemap(path: &str, out: &str) -> PyResult<()> {
     let root_path = Path::new(path);
@@ -277,8 +373,22 @@ fn treemap(path: &str, out: &str) -> PyResult<()> {
     Ok(())
 }
 
+#[pyfunction]
+fn piechart(path: &str, out: &str) -> PyResult<()> {
+    let root_path = Path::new(path);
+    
+    let root_node = scan_directory(root_path)
+        .map_err(|e| PyValueError::new_err(format!("Error scanning directory: {}", e)))?;
+
+    generate_piechart_image(&root_node, out)
+        .map_err(|e| PyValueError::new_err(format!("Error generating pie chart: {}", e)))?;
+
+    Ok(())
+}
+
 #[pymodule]
 fn visfile(_py: Python, m: &PyModule) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(treemap, m)?)?;
+    m.add_function(wrap_pyfunction!(piechart, m)?)?;
     Ok(())
 }
